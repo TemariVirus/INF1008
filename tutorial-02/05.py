@@ -1,30 +1,41 @@
-def checkBrackets(counts: dict[str, int], c: str, open: str, end: str):
-    counts.setdefault(open, 0)
-    if c == open:
-        counts[open] += 1
-    elif c == end:
-        if counts[open] <= 0:
-            print("Not legal")
-            exit()
-        counts[open] -= 1
-    else:
-        return False
-    return True
+class Stack:
+    def __init__(self):
+        self.items = []
+
+    def push(self, value):
+        self.items.append(value)
+
+    def pop(self):
+        return self.items.pop()
+
+    def is_empty(self):
+        return len(self.items) == 0
 
 
 if __name__ == "__main__":
-    counts = dict()
+    brackets = Stack()
+    pairs = [
+        ("(", ")"),
+        ("[", "]"),
+        ("{", "}"),
+    ]
     for c in input():
-        _ = (
-            # Short-circuit to save time
-            checkBrackets(counts, c, "(", ")")
-            or checkBrackets(counts, c, "[", "]")
-            or checkBrackets(counts, c, "{", "}")
-        )
+        for open, close in pairs:
+            if c == open:
+                brackets.push(c)
+                break
+            elif c == close:
+                if brackets.is_empty():
+                    print("Not legal")
+                    exit()
+                other = brackets.pop()
+                if other != open:
+                    print("Not legal")
+                    exit()
+                break
 
-    for v in counts.values():
-        if v > 0:
-            print("Not legal")
-            exit()
+    if not brackets.is_empty():
+        print("Not legal")
+        exit()
 
     print("Legal")
