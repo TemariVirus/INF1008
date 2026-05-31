@@ -54,6 +54,37 @@ def egg_drop_count(storeys: int, eggs: int) -> int:
     return int(min_drops[eggs][storeys])
 
 
+# From Broadman (https://arxiv.org/pdf/2511.18330v2 p3),
+# we know that with k eggs and n drops, we can solve at most
+# \sum_{j=1}^{k} (n choose j) floors.
+# This is clearly a monotonic function in n, so we can invert it with binary search.
+def egg_drop_count_fast(storeys: int, eggs: int) -> int:
+    # Time complexity:  O(eggs * log(storeys))
+    # Space complexity: O(1)
+
+    # Calculates \sum_{j=1}^{k} (n choose j)
+    def most_storeys(eggs: int, drops: int) -> int:
+        nCj = 1
+        acc = 0
+        for i in range(eggs):
+            nCj *= drops - i
+            nCj //= i + 1
+            acc += nCj
+        return acc
+
+    # Binary search
+    lower = 0
+    upper = storeys
+    while lower < upper:
+        mid = (lower + upper) // 2
+        current = most_storeys(eggs, mid)
+        if current >= storeys:
+            upper = mid
+        else:
+            lower = mid + 1
+    return upper
+
+
 # Run `python generalised_egg_count.py` (or run this file) to run the tests.
 if __name__ == "__main__":
     assert egg_drop_count(1, 1) == 1
